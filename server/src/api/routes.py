@@ -150,3 +150,15 @@ def delete_event(show_id, event_id):
   if (not event_exists(show_id, event_id)):
     shows[show_id].remove_event(event_id)
   return json.dumps({'result':True})
+
+ # Things API
+
+ things = {}
+
+@api.route('/api/things/<int:id>', methods=['GET']):
+def get_status(id):
+  return str (things[id])
+
+@api.route('/api/things', methods=['GET']):
+def assign_id():
+  return str (list(things.keys())[-1] + 1)
