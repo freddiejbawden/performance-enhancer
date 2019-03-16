@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 
@@ -19,48 +18,52 @@ const list = [
   }
 ];
 
-
-
 class App extends Component {
 
   state = {
-    votes: []
+    opts: []
   };
 
   componentDidMount() {
-    this.setState({ votes: list });
+    this.setState({ opts: list });
   }
+
   handleEvent = voteId => {
-    const updatedList = this.state.votes.map(vote => {
-      if (vote.id === voteId) {
-        return Object.assign({}, vote, {
-          votes: vote.votes + 1
-        });
-      } else {
-        return vote;
-      }
-    });
-  
-    this.setState({
-      votes: updatedList
+    this.state.opts.map(opt => {
+      if (opt.id === voteId) {
+        opt.votes++
+        this.setState({opts: [opt]});
+        // server request :  I voted
+        // console.log(this.state)
+        var xhttp = new XMLHttpRequest();
+        var url = ""; // add url here
+        xhttp.open("POST", url, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        // xhttp.send("fname=Henry&lname=Ford");
+      } 
     });
   }
 
 
   render() {
-    return this.state.votes.map(vote => (
-      <Vote key={vote.id} id={vote.id} voteName={vote.voteName} votes={vote.votes} onVote={this.handleEvent} />
-    ));
-  }
+      return this.state.opts.map(option => {
+        if (option.votes > 0) {
+          return <div className="App" key={option.voteName}>Thanks for voting!</div>; 
+        } else {          
+          return <Vote key={option.id} id={option.id} voteName={option.voteName} votes={option.votes} onVote={this.handleEvent} />;        
+        }
+      })
+    }
 }
 
 class Vote extends Component {
   handleClick = () => this.props.onVote(this.props.id);
 
   render() {
-    return <div className="App">{this.props.voteName}
-    <button onClick={this.handleClick}>+</button>{this.props.votes}</div>;
+    return <div className="App">
+    <button key={this.props.voteName} onClick={this.handleClick}>{this.props.voteName}</button></div>;
   }
 }
+
 
 export default App;
