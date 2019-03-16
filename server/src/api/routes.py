@@ -49,6 +49,12 @@ def delete_show(show_id, event_id):
 
  # Things API
 
- @api.route('/api/things/<int:id>', methods=['GET']):
- def get_status(id):
-   return str (things[id])
+ things = {}
+
+@api.route('/api/things/<int:id>', methods=['GET']):
+def get_status(id):
+  return str (things[id])
+
+@api.route('/api/things', methods=['GET']):
+def assign_id():
+  return str (list(things.keys())[-1] + 1)
