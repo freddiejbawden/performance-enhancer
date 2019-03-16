@@ -2,12 +2,6 @@ from api import api
 import json
 
 
-@api.route('/')
-@api.route('/api')
-def root():
-  return "Hello, World!"
-
-
 # Show API
 
 @api.route('/api/shows', methods=['GET'])
