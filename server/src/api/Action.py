@@ -13,3 +13,12 @@ class Action:
 
   def get_options(self):
     return self.options
+
+  def to_json(self):
+    return {'id':self.id, 'type':self.type, 'options':self.options}
+
+  def from_json(action_json, id=None):
+    id = id or action_json['id']
+    type = action_json['type']
+    options = action_json['options']
+    return Action(id, type, options)
