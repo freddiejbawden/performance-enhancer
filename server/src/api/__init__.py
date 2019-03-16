@@ -4,4 +4,4 @@ api = Flask(__name__)
 
 from api import routes
 
-api.run()
+api.run("0.0.0.0")

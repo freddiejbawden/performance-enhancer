@@ -153,12 +153,12 @@ def delete_event(show_id, event_id):
 
  # Things API
 
- things = {}
+things = {}
 
-@api.route('/api/things/<int:id>', methods=['GET']):
+@api.route('/api/things/<int:id>', methods=['GET'])
 def get_status(id):
   return str (things[id])
 
-@api.route('/api/things', methods=['GET']):
+@api.route('/api/things', methods=['GET'])
 def assign_id():
   return str (list(things.keys())[-1] + 1)
