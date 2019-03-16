@@ -46,3 +46,9 @@ def update_show(show_id, event_id):
 @api.route('/api/shows/<int:show_id>/events/<int:event_id>', methods=['DELETE'])
 def delete_show(show_id, event_id):
   return json.dumps({'result':True})
+
+ # Things API
+
+ @api.route('/api/things/<int:id>', methods=['GET']):
+ def get_status(id):
+   return str (things[id])
