@@ -62,7 +62,7 @@ def update_thing(thing_id):
     abort(400)
 
 
-@api.route('/api/shows/<int:thing_id>', methods=['DELETE'])
+@api.route('/api/things/<int:thing_id>', methods=['DELETE'])
 def delete_thing(thing_id):
   if (not thing_id in things):
     abort(404)
