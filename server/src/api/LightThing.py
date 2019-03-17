@@ -1,7 +1,9 @@
 class LightThing:
   
+  TYPE = "LIGHT"
+
   def __init__(self, id, address, levels, level):
-    self.type = "LIGHT"
+    self.type = LightThing.TYPE
     self.id = id
     self.address = address
     self.levels = levels

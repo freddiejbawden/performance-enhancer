@@ -1,7 +1,9 @@
 class SwitchThing:
 
+  TYPE = "SWITCH"
+
   def __init__(self, id, address, on):
-    self.type = "SWITCH"
+    self.type = SwitchThing.TYPE
     self.id = id
     self.address = address
     self.on = on
@@ -18,11 +20,8 @@ class SwitchThing:
   def get_on(self):
     return self.on
 
-  def set_on(self):
-    self.on = True
-
-  def set_off(self):
-    self.on = False
+  def set_on(self, on):
+    self.on = on
 
   def to_json(self):
     return {'type':self.type, 'id':self.id, 'address':self.address, 'on':self.on}
