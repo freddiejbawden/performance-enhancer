@@ -1,5 +1,9 @@
-from api import api
+from api import *
+from api.SwitchThing import SwitchThing
+from api.LightThing import LightThing
 from flask import abort
+from flask import jsonify
+from flask import request
 import json
 
 from IDGenerator import IDGenerator
@@ -12,16 +16,17 @@ things = dict()
 thing_id_gen = IDGenerator(0)
 
 def thing_from_json(thing_json):
-  type = request.json['type']
+  type = thing_json['type']
   if (type == LightThing.TYPE):
     id = thing_id_gen.next()
-    thing = LightThing.from_json(request.json, id)
-    things[id] = thing
+    thing = LightThing.from_json(thing_json, id)
+    return thing
   elif (type == SwitchThing.TYPE):
-   id = thing_id_gen.next()
-   thing = SoundThing.from_json(request.json, id)
-   things[id] = thing
+    id = thing_id_gen.next()
+    thing = SwitchThing.from_json(thing_json, id)
+    return thing
   else:
+    print("Invalid type")
     raise RuntimeError
 
 
@@ -31,13 +36,13 @@ def thing_from_json(thing_json):
 
 @api.route('/api/things', methods=['GET'])
 def get_things():
-  return json.dumps([ thing.to_json() for thing in things])
+  return jsonify([ thing.to_json() for thing in things.values()])
 
 @api.route('/api/things/<int:thing_id>', methods=['GET'])
 def get_thing(thing_id):
   if (not thing_id in things):
     abort(404)
-  return json.dumps(things[thing_id].to_json())
+  return jsonify(things[thing_id].to_json())
 
 @api.route('/api/things', methods=['POST'])
 def register_thing():
@@ -46,8 +51,9 @@ def register_thing():
   try:
     thing = thing_from_json(request.json)
     things[thing.get_id()] = thing
+    return str(thing.get_id())
   except:
-    print("Invalid thing")
+    print("Invalid thing:\n%s" % request.json)
     abort(400)
 
 @api.route('/api/things<int:thing_id>', methods=['PUT'])
@@ -60,7 +66,7 @@ def update_thing(thing_id):
     thing = thing_from_json(request.json)
     things[thing.get_id()] = thing
   except:
-    print("Invalid thing format")
+    print("Invalid thing:\n%s" % request.json)
     abort(400)
 
 
@@ -69,7 +75,7 @@ def delete_thing(thing_id):
   if (not thing_id in things):
     abort(404)
   things.pop(thing_id)
-  return json.dumps({'result':True})
+  return jsonify({'result':True})
 
 
 
@@ -83,7 +89,7 @@ def get_thing_level(thing_id):
   thing = things[thing_id]
   if (thing.get_type() != LightThing.TYPE):
     abort(404)
-  return json.dumps({'level':thing.get_level()})
+  return jsonify({'level':thing.get_level()})
 
 @api.route('/api/things/<int:thing_id>/level', methods=['PUT'])
 def update_thing_level(thing_id):
@@ -99,7 +105,7 @@ def update_thing_level(thing_id):
     things[thing_id].set_level(level)
   except:
     abort(400)
-  return json.dumps({'result':True})
+  return jsonify({'result':True})
 
 @api.route('/api/things/<int:thing_id>/levels', methods=['GOT'])
 def get_thing_levels(thing_id):
@@ -108,7 +114,7 @@ def get_thing_levels(thing_id):
   thing = things[thing_id]
   if (thing.get_type() != LightThing.TYPE):
     abort(404)
-  return json.dumps({'levels':thing.get_levels()})
+  return jsonify({'levels':thing.get_levels()})
 
 
 
@@ -122,7 +128,7 @@ def get_thing_on(thing_id):
   thing = things[thing_id]
   if (thing.get_type() != SwitchThing.TYPE):
     abort(404)
-  return json.dumps({'on':thing.get_on()})
+  return str((thing.get_on() and 1) or 0)
 
 @api.route('/api/things/<int:thing_id>/on', methods=['PUT'])
 def update_thing_on(thing_id):
@@ -136,6 +142,7 @@ def update_thing_on(thing_id):
   try:
     on = request.json['on']
     things[thing_id].set_on(on)
+    print("%d set to %b" % (thing_id, on))
   except:
     abort(400)
-  return json.dumps({'result':True})
+  return jsonify({'result':True})
