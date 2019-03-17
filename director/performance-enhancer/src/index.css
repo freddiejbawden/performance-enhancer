@@ -1,5 +1,7 @@
 @import "../node_modules/react-toggle-switch/dist/css/switch.min.css" ;
-
+h1 {
+  text-align: center;
+}
 body {
   margin: 0;
   padding: 0;

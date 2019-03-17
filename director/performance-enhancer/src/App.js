@@ -24,14 +24,16 @@ class Light extends Component {
       this.setState({button_color: '#2ba551', text_color: "white", switched: true})
     }
     var url = `http://10.42.0.27:5000/api/things/${this.props.id}/on`
-    axios.post(url, {
-      on: this.state.switched
+    axios.put(url, {
+      on: !this.state.switched
     })
     .then(function (response) {
       console.log(response);
     })
   }
-  
+  componentDidMount() {
+    this.toggleSwitch()
+  }
   render() {
     
     return(
@@ -49,17 +51,21 @@ class App extends Component {
       things: []
     }
   }
+  componentDidMount() {
+    this.getThings()
+  }
   getThings = () => {
     axios.get('http://10.42.0.27:5000/api/things')
     .then(response => {
       console.log(response)
-      this.state.things = this.response.data
+      this.setState({things: response.data})
     })
    
   }
 
   render() {
-    this.getThings()
+   
+    console.log(this.state.things)
     var thing_dom = []
     for(var i = 0; i < this.state.things.length; i++) {
       
