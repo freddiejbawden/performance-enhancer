@@ -5,160 +5,66 @@ import json
 from IDGenerator import IDGenerator
 
 
-# Dictionary of shows
-
-shows = dict()
-
-
-# Path to shows file
-
-SHOWS_PATH = "shows.json"
-
-
-# Reads shows from a JSON file
-
-def read_shows():
-  try:
-    with open(SHOWS_PATH, "r") as f:
-      show_list = [ Show.from_json(show_json) for show_json in json.load(f) ]
-      shows = dict([ (show.get_id(), show) for show in show_list ])
-  except IOError:
-    print("Unable to read shows from file")
-    raise RuntimeError
-
-
-# Writes shows into a JSON file
-
-def write_shows():
-  try:
-    with open(SHOWS_PATH, "w") as f:
-      f.write([ show.to_json() for show in shows.values() ])
-  except IOError:
-    print("Unable to write shows to file")
-    raise RuntimeError
-
-
-# Read shows from file
-
-read_shows()
-
-
-# Show ID generator
-
-if (len(shows) > 0):
-  show_id_gen = IDGenerator(max(shows) + 1)
-else:
-  show_id_gen = IDGenerator(0)
-  
-
-
-def show_exists(show_id):
-  return show_id in shows
-
-def event_exists(show_id, event_id):
-  return show_exists and event_id in shows[show_id].get_events()
-
-# Show API
-
-@api.route('/api/shows', methods=['GET'])
-def get_shows():
-  return json.dumps([ show.to_json() for show in shows.values() ])
-
-@api.route('/api/shows/<int:show_id>', methods=['GET'])
-def get_show(show_id):
-  if (show_exists(show_id)):
-    return json.dumps(shows[show_id].to_json())
-  abort(404)
-
-@api.route('/api/shows', methods=['POST'])
-def make_show():
-  if (not request.json):
-    abort(400)
-  try:
-    show = Show.from_json(request.json, show_id_gen.next())
-    shows.append(show)
-    return json.dumps(show.to_json()), 201
-  except:
-    abort(400)
-
-@api.route('/api/shows/<int:show_id>', methods=['PUT'])
-def update_show(show_id):
-  if (not show_exists(show_id)):
-    abort(404)
-  if (not request.json):
-    abort(400)
-  try:
-    show = Show.from_json(request.json, show_id)
-    shows[show_id] = show
-    return json.dumps(show.to_json())
-  except:
-    abort(400)
-
-@api.route('/api/shows/<int:show_id>', methods=['DELETE'])
-def delete_show(show_id):
-  if (not show_exists(show_id)):
-    abort(404)
-  shows.pop(show_id)
-  return json.dumps({'result':True})
-
-
-# Event API
-
-@api.route('/api/shows/<int:show_id>/events', methods=['GET'])
-def get_events(show_id):
-  if (not show_exists(show_id)):
-    abort(404)
-  show = shows[show_id]
-  return json.dumps(show.get_events().to_json())
-
-@api.route('/api/shows/<int:show_id>/events/<int:event_id>', methods=['GET'])
-def get_event(show_id, event_id):
-  if (not event_exists(show_id, event_id)):
-    abort(404)
-  event = shows[show_id].get_events()[event_id]
-  return json.dumps(event.to_json())
-
-@api.route('/api/shows/<int:show_id>/events', methods=['POST'])
-def make_event(show_id):
-  if (not show_exists(show_id)):
-    abort(404)
-  if (not request.json):
-    abort(400)
-  try:
-    show = shows[show_id]
-    event = show.add_event_from_json(request.json)
-    return json.dumps(event.to_json())
-  except:
-    abort(400)
-
-@api.route('/api/shows/<int:show_id>/events/<int:event_id>', methods=['PUT'])
-def update_event(show_id, event_id):
-  if (not event_exists(show_id, event_id)):
-    abort(404)
-  if (not request.json):
-    abort(400)
-  try:
-    show = shows[show_id]
-    event = Event.from_json(request.json, event_id)
-    show.update_event(event)
-    return json.dumps(event.to_json())
-  except:
-    abort(400)
-
-@api.route('/api/shows/<int:show_id>/events/<int:event_id>', methods=['DELETE'])
-def delete_event(show_id, event_id):
-  if (not event_exists(show_id, event_id)):
-    shows[show_id].remove_event(event_id)
-  return json.dumps({'result':True})
-
  # Things API
 
-things = {}
+things = dict()
 
-@api.route('/api/things/<int:id>', methods=['GET'])
-def get_status(id):
-  return str (things[id])
+thing_id_gen = IDGenerator(0)
+
+def thing_from_json(thing_json):
+  LIGHT_TYPE = "LIGHT"
+  SWITCH_TYPE = "SWITCH"
+
+  type = request.json['type']
+  if (type == LIGHT_TYPE):
+    id = thing_id_gen.next()
+    thing = LightThing.from_json(request.json, id)
+    things[id] = thing
+  elif (type == SWITCH_TYPE):
+   id = thing_id_gen.next()
+   thing = SoundThing.from_json(request.json, id)
+   things[id] = thing
+  else:
+    raise RuntimeError
 
 @api.route('/api/things', methods=['GET'])
-def assign_id():
-  return str (list(things.keys())[-1] + 1)
+def get_things():
+  return json.dumps([ thing.to_json() for thing in things])
+
+@api.route('/api/things/<int:thing_id>', methods=['GET'])
+def get_thing(thing_id):
+  if (not thing_id in things):
+    abort(404)
+  return json.dumps(things[thing_id].to_json())
+
+@api.route('/api/things', methods=['POS'])
+def register_thing():
+  if (not request.json):
+    abort(400)
+  try:
+    thing = thing_from_json(request.json)
+    things[thing.get_id()] = thing
+  except:
+    print("Invalid thing")
+    abort(400)
+
+@api.route('/api/things<int:thing_id>', methods=['PUT'])
+def update_thing(thing_id):
+  if (not thing_id in things):
+    abort(404)
+  if (not request.json):
+    abort(400)
+  try:
+    thing = thing_from_json(request.json)
+    things[thing.get_id()] = thing
+  except:
+    print("Invalid thing format")
+    abort(400)
+
+
+@api.route('/api/shows/<int:thing_id>', methods=['DELETE'])
+def delete_thing(thing_id):
+  if (not thing_id in things):
+    abort(404)
+  things.pop(thing_id)
+  return json.dumps({'result':True})
