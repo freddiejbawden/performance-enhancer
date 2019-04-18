@@ -2,8 +2,12 @@
 
 _holy moly this repo is a mess_
 
+🏅 Winner of MLH "Best IoT hack using a QuallComm Dragonboard"
+🏅 Runner-up in the "Best Use of ARM Technology"
+
 This is an IoT system designed to be in theatres/small gig venues to allow for performers to trigger
 and set lighting to suit their needs. It was made during HtB 2019; winning the ARM prize for "Most Interesting Use Of ARM Hardware" and the MLH prize for "Best Hack Using the Dragonboard". Below is a copy of the [Devpost](https://devpost.com/software/performance-enhancer) submission.
+
 ## Inspiration
 
 How can we combine all of the things? An overly ambitious hack using new technologies we haven't used before sure! We originally wanted to make Fringe show transition times shorter by abstracting the lighting, sound and images into a block based interface - while we didn't get 80% of it done, the base system is still pretty cool.
