@@ -3,6 +3,7 @@
 _holy moly this repo is a mess_
 
 🏅 Winner of MLH "Best IoT hack using a QuallComm Dragonboard"
+
 🏅 Runner-up in the "Best Use of ARM Technology"
 
 This is an IoT system designed to be in theatres/small gig venues to allow for performers to trigger
